@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://logback.qos.ch/manual/appenders.html 官网 -->
+
+<configuration scan="true" debug="false">
+    <contextName>timer</contextName>
+	<!--application.properities中配置的变量-->
+    <springProperty scope="context" name="name" source="log.name"/>
+	<springProperty scope="context" name="path" source="log.path"/>
+
+    <!-- 输出到控制台 -->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- 默认情况下，每个日志事件都会立即刷新到基础输出流。 这种默认方法更安全，因为如果应用程序在没有正确关闭appender的情况下退出，则日志事件不会丢失。
+		但是，为了显着增加日志记录吞吐量，您可能希望将immediateFlush属性设置为false -->
+        <encoder>
+            <pattern>%red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %cyan(%logger{10}) - (%msg%n)</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+	<!-- 输出到文件
+	encoding：日志的编码
+	file：指定当前生成的日志文件名称
+	rollingPolicy：滚动策略
+	FileNamePattern：移动文件最后的名称，跟file标签结合使用，ps:file里面的内容是  1.txt,那么，FileNamePattern里面写的是2.txt，那么最后文件名就为2.txt,如果最后结尾是gz或者zip，那么，就会自动打成压缩包-->
+    <appender name="fileLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+   	    <file>${name}.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>
+                [%date{yyyy-MM-dd HH:mm:ss.SSS}] %X{logthreadId} %-5level %logger{80} %method  %line - %msg%n
+            </pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${path}/${name}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<!-- 每产生一个日志文件，该日志文件的保存期限为30天, ps:maxHistory的单位是根据fileNamePattern中的翻转策略自动推算出来的,例如上面选用了yyyy-MM-dd,则单位为天
+			如果上面选用了yyyy-MM,则单位为月,fileNamePattern单位默认为yyyy-MM-dd-->
+            <maxHistory>30</maxHistory>
+            <!-- maxFileSize:这是活动文件的大小，默认值是10MB，测试时可改成5KB看效果 -->
+            <maxFileSize>5kb</maxFileSize>
+            <!-- 每个日志文件到10mb的时候开始切分，最多保留30天，但最大到20GB，哪怕没到30天也要删除多余的日志 -->
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+
+    <!-- <logger name="com.apexsoft.timer" level="${logLevel}" additivity="false">
+        <appender-ref ref="fileLog" />
+        <appender-ref ref="stdout"  />
+    </logger> -->
+
+    <root level="INFO">
+<!--        <appender-ref ref="fileLog" />-->
+        <appender-ref ref="stdout"  />
+    </root>
+</configuration>

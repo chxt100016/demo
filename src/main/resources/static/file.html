@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>fileup</title>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+</head>
+<body>
+<input type="file" id="file">
+<input type="button" value="sub" onclick="upload()">
+</body>
+<script>
+    function upload() {
+        var file = $("#file")[0].files[0];
+        var formData = new FormData();
+        formData.append("file",file);
+
+        $.ajax({
+            type:'post',
+            url:'./file',
+            processData:false,
+            contentType:false,
+            data:formData,
+            success:function (msg) {
+                alert(msg);
+            }
+        });
+
+    }
+</script>
+</html>
